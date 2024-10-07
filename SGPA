@@ -49,7 +49,7 @@ System.out.print("Enter USN: ");
 usn = s.nextLine();
 }
 void getMarks() {
-for (int i = 0; i < 3; i++) {
+for (int i = 0; i < 8; i++) {
 System.out.print("Enter marks for subject " + (i + 1) + ": ");
 subject[i].subjectMarks = s.nextInt();
 System.out.print("Enter credits for subject " + (i + 1) + ": ");
