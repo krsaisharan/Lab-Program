@@ -1,0 +1,136 @@
+import java.util.*;
+
+abstract class Acc {
+    String cName;
+    String accNum;
+    double bal;
+
+    public Acc(String cName, String accNum) {
+        this.cName = cName;
+        this.accNum = accNum;
+        this.bal = 0.0;
+    }
+
+    public void deposit(double amt) {
+        bal += amt;
+        System.out.println("Deposited: " + amt);
+    }
+
+    public void displayBal() {
+        System.out.println("Current Balance: " + bal);
+    }
+
+    public double getBal() {
+        return bal;
+    }
+    
+    public abstract void withdraw(double amt);
+}
+
+class SavAcc extends Acc {
+    private double intRate;
+
+    public SavAcc(String cName, String accNum, double intRate) {
+        super(cName, accNum);
+        this.intRate = intRate;
+    }
+
+    public void computeAndDepositInt() {
+        double interest = bal * intRate / 100;
+        bal += interest;
+        System.out.println("Interest Deposited: " + interest);
+    }
+    
+    public void withdraw(double amt) {
+        if (amt <= bal) {
+            bal -= amt;
+            System.out.println("Withdrawn: " + amt);
+        } else {
+            System.out.println("Insufficient balance");
+        }
+    }
+}
+
+class CurAcc extends Acc {
+    private double minBal;
+    private double srvCharge;
+
+    public CurAcc(String cName, String accNum, double minBal, double srvCharge) {
+        super(cName, accNum);
+        this.minBal = minBal;
+        this.srvCharge = srvCharge;
+    }
+
+    public void withdraw(double amt) {
+        if (amt <= bal) {
+            bal -= amt;
+            System.out.println("Withdrawn: " + amt);
+        } else {
+            System.out.println("Insufficient balance for withdrawal.");
+        }
+        checkMinBal();
+    }
+
+    private void checkMinBal() {
+        if (bal < minBal) {
+            bal -= srvCharge;
+            System.out.println("Service charge applied: " + srvCharge);
+        }
+    }
+}
+
+public class BankAcc {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter account type (savings/current): ");
+        String accType = sc.nextLine().toLowerCase();
+        System.out.print("Enter your name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter account number: ");
+        String accNumber = sc.nextLine();
+
+        Acc account;
+        if (accType.equals("savings")) {
+            System.out.print("Enter interest rate: ");
+            double intRate = sc.nextDouble();
+            account = new SavAcc(name, accNumber, intRate);
+        } else {
+            System.out.print("Enter minimum balance: ");
+            double minBal = sc.nextDouble();
+            System.out.print("Enter service charge: ");
+            double srvCharge = sc.nextDouble();
+            account = new CurAcc(name, accNumber, minBal, srvCharge);
+        }
+        
+        while (true) {
+            System.out.println("\n1. Deposit\n2. Withdraw\n3. Display Balance\n4. Compute Interest");
+            System.out.print("Choose an option: ");
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter deposit amount: ");
+                    double depAmt = sc.nextDouble();
+                    account.deposit(depAmt);
+                    break;
+                case 2:
+                    System.out.print("Enter withdrawal amount: ");
+                    double withAmt = sc.nextDouble();
+                    account.withdraw(withAmt);
+                    break;
+                case 3:
+                    account.displayBal();
+                    break;
+                case 4:
+                    if (account instanceof SavAcc) {
+                        ((SavAcc) account).computeAndDepositInt();
+                    } else {
+                        System.out.println("Interest computation is not applicable for Current Account.");
+                    }
+                    break;
+                default:
+                    System.out.println("Invalid option, try again");
+            }
+        }
+    }
+}
